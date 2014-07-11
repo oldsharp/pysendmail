@@ -29,7 +29,7 @@ BCC = ['bcc1@example.com', 'bcc2@example.com',]
 
 SUBJECT = 'subject'
 
-BODY = '/home/ray/sendmail/mailbody'
+BODY = '/path/to/mailbody'
 
 ATTACH_FILES = ['/path/to/attach1', '/path/to/attach2']
 
