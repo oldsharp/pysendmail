@@ -14,6 +14,9 @@ from email.utils import formatdate
 COMMASPACE = ', '
 
 SMTP_HOST = '10.177.9.96'
+SMTP_PORT = 25
+SMTP_AUTH = False
+SMTP_STARTTLS = False
 SMTP_USER = 'username'
 SMTP_PASS = 'password'
 
@@ -22,9 +25,7 @@ DATE = formatdate(localtime=True)
 FROM = 'Rui.Chen@sandisk.com'
 
 TO = ['oldsharp@163.com', 'oldsharp@gmail.com',]
-
 CC = ['cc1@example.com', 'cc2@example.com',]
-
 BCC = ['bcc1@example.com', 'bcc2@example.com',]
 
 SUBJECT = 'subject'
@@ -64,8 +65,13 @@ def sendmail():
                                filename=os.path.basename(f))
         msg.attach(attach_file)
 
-    s = smtplib.SMTP(host=SMTP_HOST)
-    #s.login(user=SMTP_USER, password=SMTP_PASS)
+    s = smtplib.SMTP(host=SMTP_HOST, port=SMTP_PORT)
+    if SMTP_AUTH:
+        if SMTP_STARTTLS:
+            s.ehlo()
+            s.starttls()
+            s.ehlo()
+        s.login(user=SMTP_USER, password=SMTP_PASS)
     s.sendmail(FROM, TO+CC+BCC, msg.as_string())
     s.quit()
 
