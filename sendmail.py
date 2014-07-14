@@ -45,8 +45,6 @@ def sendmail():
         msg['To'] = COMMASPACE.join(TO)
     if CC:
         msg['Cc'] = COMMASPACE.join(CC)
-    if BCC:
-        msg['Bcc'] = COMMASPACE.join(BCC)
 
     msg['Date'] = DATE
     msg['Subject'] = SUBJECT
