@@ -24,8 +24,7 @@ def check_non_ascii(raw):
 
 def parse():
     """Parse args specified by command-line."""
-    parser = argparse.ArgumentParser(
-        description="""\
+    parser = argparse.ArgumentParser(description="""\
 Send the contents specified by command-line args as a MIME message.
 """)
 
