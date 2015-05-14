@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python2
+# -*- coding: utf-8 -*-
 
 
 """Send the contents specified by command-line args as a MIME message."""
