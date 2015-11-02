@@ -10,6 +10,7 @@
 
 
 import argparse
+import codecs
 import os.path
 import smtplib
 from email import encoders
@@ -25,16 +26,16 @@ COMMASPACE = ", "
 
 def check_non_ascii(raw):
     """Return True if contain non-ascii char."""
-    chars = raw.decode("utf-8") if isinstance(raw, str) else raw
+    chars = raw.decode(encoding="utf-8") if isinstance(raw, str) else raw
     return not all(ord(ch) < 128 for ch in chars)
 
 
 def parse():
     """Parse args specified by command-line."""
     parser = argparse.ArgumentParser(
-                            description=(
-                                "Send the contents specified by "
-                                "command-line args as a MIME message."))
+        description=(
+            "Send the contents specified by "
+            "command-line args as a MIME message."))
 
     parser.add_argument("-H", "--host", type=str, action="store",
                         metavar="HOST", required=True,
@@ -88,6 +89,9 @@ def parse():
                         metavar="MAILFILE", default="",
                         help="""Mail contents will read from given file path.
                         Note this only take affect when -M is not set.""")
+    parser.add_argument("-E", "--encoding", type=str, action="store",
+                        metavar="ENCODING", default="utf-8",
+                        help="""Mail file encoding.""")
     parser.add_argument("-a", "--attach", type=str, action="append",
                         metavar="ATTACHMENT", default=[], dest="attachs",
                         help="""Attachment file path. Could be specified
@@ -98,7 +102,34 @@ def parse():
 
 def sendmail(args):
     """Assemble MIME message and send to SMTP server."""
-    msg = MIMEMultipart()
+    if not args.attachs:
+        if args.mailbody:
+            if check_non_ascii(args.mailbody):
+                msg = MIMEText(args.mailbody, "plain", "utf-8")
+            else:
+                msg = MIMEText(args.mailbody, "plain", "us-ascii")
+        else:
+            with codecs.open(args.mailfile, "r", encoding=args.encoding) as fp:
+                # FIXME: load all context into mem is not a good idea
+                mailbody = fp.read()
+                if check_non_ascii(mailbody):
+                    msg = MIMEText(mailbody, "plain", "utf-8")
+                else:
+                    msg = MIMEText(mailbody, "plain", "us-ascii")
+    else:
+        msg = MIMEMultipart()
+        if args.mailbody:
+            if check_non_ascii(args.mailbody):
+                msg.attach(MIMEText(args.mailbody, "plain", "utf-8"))
+            else:
+                msg.attach(MIMEText(args.mailbody, "plain", "us-ascii"))
+        else:
+            with codecs.open(args.mailfile, "r", encoding=args.encoding) as fp:
+                mailbody = fp.read()
+                if check_non_ascii(mailbody):
+                    msg.attach(MIMEText(mailbody, "plain", "utf-8"))
+                else:
+                    msg.attach(MIMEText(mailbody, "plain", "us-ascii"))
 
     # Take care of mail header:
     msg["From"] = args.sender
@@ -113,26 +144,13 @@ def sendmail(args):
     else:
         msg["Subject"] = args.subject
 
-    if args.mailbody:
-        if check_non_ascii(args.mailbody):
-            msg.attach(MIMEText(args.mailbody, "plain", "utf-8"))
-        else:
-            msg.attach(MIMEText(args.mailbody, "plain"))
-    else:
-        with open(args.mailfile, "rb") as fp:
-            mailbody = fp.read()
-            if check_non_ascii(mailbody):
-                msg.attach(MIMEText(mailbody, "plain", "utf-8"))
-            else:
-                msg.attach(MIMEText(mailbody, "plain"))
-
     # Add attachments:
     for f in args.attachs:
         attach_file = MIMEBase("application", "octet-stream")
         with open(f, "rb") as fp:
             attach_file.set_payload(fp.read())
         encoders.encode_base64(attach_file)
-        #(CHARSET, LANGUAGE, VALUE)
+        # (CHARSET, LANGUAGE, VALUE)
         # FIXME: By setting filename tuple, gmail can not repr
         # Non-ASCII attach filename.
         filename = os.path.basename(f)
