@@ -83,7 +83,7 @@ def parse():
                         metavar="SUBJECT", default="",
                         help="""The value of the Subject: header.""")
     parser.add_argument("-M", "--mailbody", type=str, action="store",
-                        metavar="MAILBODY", default="",
+                        metavar="MAILBODY", default=None,
                         help="""Mail contents in plain text.""")
     parser.add_argument("-F", "--mailfile", type=str, action="store",
                         metavar="MAILFILE", default="",
@@ -103,7 +103,7 @@ def parse():
 def sendmail(args):
     """Assemble MIME message and send to SMTP server."""
     if not args.attachs:
-        if args.mailbody:
+        if args.mailbody is not None:
             if check_non_ascii(args.mailbody):
                 msg = MIMEText(args.mailbody, "plain", "utf-8")
             else:
@@ -118,7 +118,7 @@ def sendmail(args):
                     msg = MIMEText(mailbody, "plain", "us-ascii")
     else:
         msg = MIMEMultipart()
-        if args.mailbody:
+        if args.mailbody is not None:
             if check_non_ascii(args.mailbody):
                 msg.attach(MIMEText(args.mailbody, "plain", "utf-8"))
             else:
