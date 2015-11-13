@@ -64,7 +64,7 @@ def parse():
                         Default to empty string.""")
     parser.add_argument("-f", "--from", type=str, action="store",
                         metavar="SENDER", required=True, dest="sender",
-                        help="""The value of the From: header. Required""")
+                        help="""The value of the From: header. Required.""")
     parser.add_argument("-t", "--to", type=str, action="append",
                         metavar="RECIPIENT", default=[], dest="recipients",
                         help="""A To: header value. Could be specified
@@ -91,7 +91,7 @@ def parse():
                         Note this only take affect when -M is not set.""")
     parser.add_argument("-E", "--encoding", type=str, action="store",
                         metavar="ENCODING", default="utf-8",
-                        help="""Mail file encoding.""")
+                        help="""Mail file encoding.  Default to utf-8.""")
     parser.add_argument("-a", "--attach", type=str, action="append",
                         metavar="ATTACHMENT", default=[], dest="attachs",
                         help="""Attachment file path. Could be specified
