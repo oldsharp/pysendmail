@@ -1,6 +1,6 @@
 pysendmail
 
-A handy command-line tool that helps you send mail via smtp.
+Send mail in command line through an existing SMTP server.
 
 
 License
