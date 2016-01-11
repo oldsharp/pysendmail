@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Author: Ray Chen <oldsharp@gmail.com>
-#
-# This program has been placed in the public domain.
+# License: Public Domain
 
 
 """Send the contents specified by command-line args as a MIME message."""
